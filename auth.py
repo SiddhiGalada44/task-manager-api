@@ -10,9 +10,13 @@ load_dotenv()
 SECRET_KEY=os.getenv("SECRET_KEY")
 
 def hash_password(plain_password):
-    return bcrypt.hashpw(plain_password.encode(), bcrypt.gensalt())
+    hashed = bcrypt.hashpw(plain_password.encode(), bcrypt.gensalt())
+    # store as string so it works with both SQLite and PostgreSQL
+    return hashed.decode("utf-8")
 
 def check_password(plain_password, hashed_password):
+    if isinstance(hashed_password, str):
+        hashed_password = hashed_password.encode()
     return bcrypt.checkpw(plain_password.encode(), hashed_password)
 
 def generate_token(user_id):
